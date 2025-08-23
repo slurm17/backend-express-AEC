@@ -14,15 +14,21 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@serialport/parser-readline": "^13.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "modbus-serial": "^8.0.21-no-serial-port",
+    "multer": "^2.0.2",
     "node-adodb": "^5.0.3",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "serialport": "^13.0.0",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/multer": "^2.0.0",
     "@types/node": "^24.2.1",
     "@types/pg": "^8.15.5",
     "nodemon": "^3.1.10",

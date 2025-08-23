@@ -1,6 +1,7 @@
-// src/controllers/imagen.controller.ts
 import type { Request, Response, NextFunction } from "express";
-import * as imagenService from "../services/imagen.service.js"
+import * as imagenService from "../services/imagen.service.js";
+import fs from "fs";
+import path from "path";
 
 export const getImagenes = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -24,7 +25,17 @@ export const getImagen = async (req: Request, res: Response, next: NextFunction)
 
 export const createImagen = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const nuevaImagen = await imagenService.createImagen(req.body);
+    const file = req.file;
+    if (!file) return res.status(400).json({ message: "Archivo de imagen requerido" });
+
+    const nuevaImagen = await imagenService.createImagen({
+      url: `/uploads/${file.filename}`,
+      titulo: req.body.titulo,
+      descripcion: req.body.descripcion,
+      activa: req.body.activa === "true",
+      orden: Number(req.body.orden),
+    });
+
     res.status(201).json(nuevaImagen);
   } catch (error) {
     next(error);
@@ -34,8 +45,24 @@ export const createImagen = async (req: Request, res: Response, next: NextFuncti
 export const updateImagen = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
-    const imagenActualizada = await imagenService.updateImagen(id, req.body);
+    const file = req.file;
+    const url = req.body.url
+
+    if (!file && !url) return res.status(400).json({ message: "Archivo de imagen requerido" });
+
+      const data = {
+        url: file ? `/uploads/${file.filename}` : url,
+        titulo: req.body.titulo,
+        descripcion: req.body.descripcion,
+        activa: req.body.activa === "true",
+        orden: Number(req.body.orden),
+      };
+    
+
+    const imagenActualizada = await imagenService.updateImagen(id, data);
+    
     if (!imagenActualizada) return res.status(404).json({ message: "Imagen no encontrada" });
+
     res.json(imagenActualizada);
   } catch (error) {
     next(error);

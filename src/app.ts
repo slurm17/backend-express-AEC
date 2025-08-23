@@ -4,16 +4,90 @@ import routes from "./routes/index.js";
 import userRoutes from "./routes/user.routes.js"
 import accessRoutes from "./routes/access.routes.js";
 import imagenRoutes from "./routes/imagenes.routes.js"
+import textosRoutes from "./routes/textos.routes.js";
+import path from "path";
+import http from "http";
+import { SerialPort } from "serialport";
+import { ReadlineParser } from "@serialport/parser-readline";
+import  { Server } from "socket.io";
+// import bodyParser from "body-parser";
+// import printRoutes from "./routes/";
+import { fileURLToPath } from "url";
+import { activarRele } from "../src/services/relay.service.js"
+
 const app = express();
+const server = http.createServer(app);
+
+let socioValido = {
+  dni: "29855048",
+  nombre: "Jose Francisco",
+  apellido: "Igarza",
+  nroSocio: "36476",
+  cuentaAlDia: false // Cambiar a false para simular cuota vencida
+};
+
+// PRUEBAS DE ACCESO SOCIO
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173", // puerto de tu frontend (Vite en este ejemplo)
+    methods: ["GET", "POST"]
+  }
+});
+const port = new SerialPort({
+  path: "COM6",
+  baudRate: 115200
+});
+const parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
+server.listen(4000, () => {
+  console.log("Servidor corriendo en http://localhost:4000");
+});
+parser.on("data", (data) => {
+  const dniLeido = data.trim();
+  console.log("DNI leído:", dniLeido);
+  let estado = "";
+  let socio = null;
+
+  if (dniLeido === socioValido.dni) {
+    socio = socioValido;
+    if (socio.cuentaAlDia) {
+      estado = "ACCESO PERMITIDO ✅";
+      activarRele(0);
+    } else {
+      estado = "ACCESO DENEGADO - CUOTA ATRASADA ❌";
+    }
+  } else {
+    estado = "SOCIO INVÁLIDO ⚠️";
+  }
+
+  io.emit("resultado-socio", {
+    dni: dniLeido,
+    socio,
+    estado
+  });
+});
+
+// ------------------------------------------------
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
+// app.use(express.static(path.join(__dirname, "public")));
+// app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
 
 // Rutas
 app.use("/api", routes);
 app.use("/api/users", userRoutes);
 app.use("/api/access", accessRoutes);
 app.use("/api/imagenes", imagenRoutes);
+app.use("/api/textos", textosRoutes);
+// app.use("/api", printRoutes);
 
 export default app;

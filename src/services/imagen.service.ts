@@ -1,5 +1,7 @@
 // src/services/imagen.service.ts
 import { pool } from '../config/db.js'
+import fs from "fs";
+import path from "path";
 
 export const getAllImagenes = async () => {
   const result = await pool.query("SELECT * FROM imagenes ORDER BY orden ASC");
@@ -37,6 +39,25 @@ export const updateImagen = async (id: number, data: Partial<{ url: string; titu
 };
 
 export const deleteImagen = async (id: number) => {
-  const result = await pool.query("DELETE FROM imagenes WHERE id = $1 RETURNING id", [id]);
-  return (result.rowCount ?? 0) > 0;
+  // 1. Buscar la URL en la DB
+  const resultSelect = await pool.query("SELECT url FROM imagenes WHERE id = $1", [id]);
+  if (resultSelect.rowCount === 0) return false;
+
+  const url = resultSelect.rows[0].url;
+
+  // 2. Borrar el registro
+  const resultDelete = await pool.query("DELETE FROM imagenes WHERE id = $1 RETURNING id", [id]);
+  if (resultDelete.rowCount === 0) return false;
+
+  // 3. Borrar archivo físico
+  const filePath = path.join(process.cwd(), "uploads", path.basename(url));
+
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      // No cortar el flujo si falla, solo logueamos
+      console.error("Error borrando archivo:", err);
+    }
+  });
+
+  return true;
 };
