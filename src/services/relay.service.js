@@ -2,8 +2,8 @@ import { MODBUS } from "../config/constants.js";
 // @ts-ignore
 import ModbusRTU from "modbus-serial";
 
-export const activarRele = async (puerto: number) => {
-  const client = new (ModbusRTU as any)();
+export const activarRele = async (puerto) => {
+  const client = new ModbusRTU();
   try {
     await client.connectTCP(MODBUS.RELAY_IP, { port: MODBUS.RELAY_PORT });
     client.setID(MODBUS.RELAY_ID);

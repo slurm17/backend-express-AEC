@@ -6,12 +6,12 @@ export const getAllTextos = async () => {
   return result.rows;
 };
 
-export const getTextoById = async (id: number) => {
+export const getTextoById = async (id) => {
   const result = await pool.query("SELECT * FROM textos WHERE id = $1", [id]);
   return result.rows[0] || null;
 };
 
-export const createTexto = async (data: { contenido: string; orden: number; activo?: boolean }) => {
+export const createTexto = async (data) => {
   const { contenido, orden, activo = true } = data;
   const result = await pool.query(
     "INSERT INTO textos (contenido, orden, activo) VALUES ($1, $2, $3) RETURNING *",
@@ -20,7 +20,7 @@ export const createTexto = async (data: { contenido: string; orden: number; acti
   return result.rows[0];
 };
 
-export const updateTexto = async (id: number, data: Partial<{ contenido: string; orden: number; activo: boolean }>) => {
+export const updateTexto = async (id, data) => {
   const { contenido, orden, activo } = data;
   const result = await pool.query(
     `UPDATE textos 
@@ -34,7 +34,7 @@ export const updateTexto = async (id: number, data: Partial<{ contenido: string;
   return result.rows[0] || null;
 };
 
-export const deleteTexto = async (id: number) => {
+export const deleteTexto = async (id) => {
   const result = await pool.query("DELETE FROM textos WHERE id = $1 RETURNING id", [id]);
   return (result.rowCount ?? 0) > 0;
 };

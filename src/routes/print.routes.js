@@ -1,10 +1,7 @@
-// // const express = require("express");
-// import express from "express";
-// const router = express.Router();
-// import { imprimirTicket } from "../controllers/print.controller";
-// // const { imprimirTicket } = require("../controllers/print.controller");
+import { Router } from "express";
+import { imprimirTicket } from "../controllers/print.controller.js";
 
+const router = Router();
+router.post("/", imprimirTicket);
 
-// router.post("/imprimir", imprimirTicket);
-
-// module.exports = router;
+export default router;

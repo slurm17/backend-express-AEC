@@ -1,9 +1,8 @@
-import type { Request, Response, NextFunction } from "express";
 import * as imagenService from "../services/imagen.service.js";
 import fs from "fs";
 import path from "path";
 
-export const getImagenes = async (req: Request, res: Response, next: NextFunction) => {
+export const getImagenes = async (req, res, next) => {
   try {
     const imagenes = await imagenService.getAllImagenes();
     res.json(imagenes);
@@ -12,7 +11,7 @@ export const getImagenes = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-export const getImagen = async (req: Request, res: Response, next: NextFunction) => {
+export const getImagen = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     const imagen = await imagenService.getImagenById(id);
@@ -23,7 +22,7 @@ export const getImagen = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
-export const createImagen = async (req: Request, res: Response, next: NextFunction) => {
+export const createImagen = async (req, res, next) => {
   try {
     const file = req.file;
     if (!file) return res.status(400).json({ message: "Archivo de imagen requerido" });
@@ -42,7 +41,7 @@ export const createImagen = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-export const updateImagen = async (req: Request, res: Response, next: NextFunction) => {
+export const updateImagen = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     const file = req.file;
@@ -69,7 +68,7 @@ export const updateImagen = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-export const deleteImagen = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteImagen = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     const eliminada = await imagenService.deleteImagen(id);

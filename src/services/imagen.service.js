@@ -8,12 +8,12 @@ export const getAllImagenes = async () => {
   return result.rows;
 };
 
-export const getImagenById = async (id: number) => {
+export const getImagenById = async (id) => {
   const result = await pool.query("SELECT * FROM imagenes WHERE id = $1", [id]);
   return result.rows[0] || null;
 };
 
-export const createImagen = async (data: { url: string; titulo?: string; descripcion?: string; activa?: boolean, orden: number }) => {
+export const createImagen = async (data) => {
   const { url, titulo, descripcion, activa = true, orden } = data;
   const result = await pool.query(
     "INSERT INTO imagenes (url, titulo, descripcion, activa, orden) VALUES ($1, $2, $3, $4, $5) RETURNING *",
@@ -22,7 +22,7 @@ export const createImagen = async (data: { url: string; titulo?: string; descrip
   return result.rows[0];
 };
 
-export const updateImagen = async (id: number, data: Partial<{ url: string; titulo: string; descripcion: string; activa: boolean, orden: number }>) => {
+export const updateImagen = async (id, data) => {
   const { url, titulo, descripcion, activa, orden } = data;
   const result = await pool.query(
     `UPDATE imagenes 
@@ -38,7 +38,7 @@ export const updateImagen = async (id: number, data: Partial<{ url: string; titu
   return result.rows[0] || null;
 };
 
-export const deleteImagen = async (id: number) => {
+export const deleteImagen = async (id) => {
   // 1. Buscar la URL en la DB
   const resultSelect = await pool.query("SELECT url FROM imagenes WHERE id = $1", [id]);
   if (resultSelect.rowCount === 0) return false;

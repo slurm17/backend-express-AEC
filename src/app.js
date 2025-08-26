@@ -5,6 +5,7 @@ import userRoutes from "./routes/user.routes.js"
 import accessRoutes from "./routes/access.routes.js";
 import imagenRoutes from "./routes/imagenes.routes.js"
 import textosRoutes from "./routes/textos.routes.js";
+import printRoutes from "./routes/print.routes.js";
 import path from "path";
 import http from "http";
 import { SerialPort } from "serialport";
@@ -13,10 +14,14 @@ import  { Server } from "socket.io";
 // import bodyParser from "body-parser";
 // import printRoutes from "./routes/";
 import { fileURLToPath } from "url";
-import { activarRele } from "../src/services/relay.service.js"
+import { activarRele } from "./services/relay.service.js"
+import { SERIAL } from "./config/constants.js";
+
 
 const app = express();
 const server = http.createServer(app);
+
+// PRUEBAS DE ACCESO SOCIO
 
 let socioValido = {
   dni: "29855048",
@@ -26,17 +31,15 @@ let socioValido = {
   cuentaAlDia: false // Cambiar a false para simular cuota vencida
 };
 
-// PRUEBAS DE ACCESO SOCIO
-
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // puerto de tu frontend (Vite en este ejemplo)
+    origin: ["http://localhost:5173", "http://localhost:5174"], // puerto de tu frontend (Vite en este ejemplo)
     methods: ["GET", "POST"]
   }
 });
 const port = new SerialPort({
-  path: "COM6",
-  baudRate: 115200
+  path: SERIAL.ENTRADA,
+  baudRate: SERIAL.BAUD_RATE
 });
 const parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
 server.listen(4000, () => {
@@ -88,6 +91,9 @@ app.use("/api/users", userRoutes);
 app.use("/api/access", accessRoutes);
 app.use("/api/imagenes", imagenRoutes);
 app.use("/api/textos", textosRoutes);
+app.use("/api/imprimir", printRoutes);
+
+
 // app.use("/api", printRoutes);
 
 export default app;
