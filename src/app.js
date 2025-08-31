@@ -8,73 +8,78 @@ import textosRoutes from "./routes/textos.routes.js";
 import printRoutes from "./routes/print.routes.js";
 import path from "path";
 import http from "http";
-import { SerialPort } from "serialport";
-import { ReadlineParser } from "@serialport/parser-readline";
-import  { Server } from "socket.io";
+// import { SerialPort } from "serialport";
+// import { ReadlineParser } from "@serialport/parser-readline";
+// import  { Server } from "socket.io";
 // import bodyParser from "body-parser";
 // import printRoutes from "./routes/";
 import { fileURLToPath } from "url";
-import { activarRele } from "./services/relay.service.js"
-import { SERIAL } from "./config/constants.js";
+// import { activarRele } from "./services/relay.service.js"
+// import { SERIAL } from "./config/constants.js";
+import { initIo } from "./sockets/init-io.js";
+import { entradaScanner } from "./sockets/entrada-scanner.js";
+import { salidaScanner } from "./sockets/salida-scanner.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = http.createServer(app);
 
 // PRUEBAS DE ACCESO SOCIO
 
-let socioValido = {
-  dni: "29855048",
-  nombre: "Jose Francisco",
-  apellido: "Igarza",
-  nroSocio: "36476",
-  cuentaAlDia: false // Cambiar a false para simular cuota vencida
-};
+const io = initIo(server);
+entradaScanner(io);
+salidaScanner(io);
 
-const io = new Server(server, {
-  cors: {
-    origin: ["http://localhost:5173", "http://localhost:5174"], // puerto de tu frontend (Vite en este ejemplo)
-    methods: ["GET", "POST"]
-  }
-});
-const port = new SerialPort({
-  path: SERIAL.ENTRADA,
-  baudRate: SERIAL.BAUD_RATE
-});
-const parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
-server.listen(4000, () => {
-  console.log("Servidor corriendo en http://localhost:4000");
-});
-parser.on("data", (data) => {
-  const dniLeido = data.trim();
-  console.log("DNI leído:", dniLeido);
-  let estado = "";
-  let socio = null;
+// let socioValido = {
+//   dni: "29855048",
+//   nombre: "Jose Francisco",
+//   apellido: "Igarza",
+//   nroSocio: "36476",
+//   cuentaAlDia: false // Cambiar a false para simular cuota vencida
+// };
 
-  if (dniLeido === socioValido.dni) {
-    socio = socioValido;
-    if (socio.cuentaAlDia) {
-      estado = "ACCESO PERMITIDO ✅";
-      activarRele(0);
-    } else {
-      estado = "ACCESO DENEGADO - CUOTA ATRASADA ❌";
-    }
-  } else {
-    estado = "SOCIO INVÁLIDO ⚠️";
-  }
+// const io = new Server(server, {
+//   cors: {
+//     origin: ["http://localhost:5173", "http://localhost:5174"], // puerto de tu frontend (Vite en este ejemplo)
+//     methods: ["GET", "POST"]
+//   }
+// });
+// const port = new SerialPort({
+//   path: SERIAL.ENTRADA,
+//   baudRate: SERIAL.BAUD_RATE
+// });
+// const parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
+// server.listen(4000, () => {
+//   console.log("Servidor corriendo en http://localhost:4000");
+// });
+// parser.on("data", (data) => {
+//   const dniLeido = data.trim();
+//   console.log("DNI leído:", dniLeido);
+//   let estado = "";
+//   let socio = null;
 
-  io.emit("resultado-socio", {
-    dni: dniLeido,
-    socio,
-    estado
-  });
-});
+//   if (dniLeido === socioValido.dni) {
+//     socio = socioValido;
+//     if (socio.cuentaAlDia) {
+//       estado = "ACCESO PERMITIDO ✅";
+//       activarRele(0);
+//     } else {
+//       estado = "ACCESO DENEGADO - CUOTA ATRASADA ❌";
+//     }
+//   } else {
+//     estado = "SOCIO INVÁLIDO ⚠️";
+//   }
+
+//   io.emit("resultado-socio", {
+//     dni: dniLeido,
+//     socio,
+//     estado
+//   });
+// });
 
 // ------------------------------------------------
-
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Middlewares
 app.use(cors());
