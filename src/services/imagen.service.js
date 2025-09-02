@@ -1,5 +1,5 @@
 // src/services/imagen.service.ts
-import { pool } from '../config/db.js'
+import { pool } from "../config/db.js";
 import fs from "fs";
 import path from "path";
 
@@ -41,13 +41,13 @@ export const updateImagen = async (id, data) => {
 export const deleteImagen = async (id) => {
   // 1. Buscar la URL en la DB
   const resultSelect = await pool.query("SELECT url FROM imagenes WHERE id = $1", [id]);
-  if (resultSelect.rowCount === 0) return false;
+  if (resultSelect.rowCount === 0) {return false;}
 
   const url = resultSelect.rows[0].url;
 
   // 2. Borrar el registro
   const resultDelete = await pool.query("DELETE FROM imagenes WHERE id = $1 RETURNING id", [id]);
-  if (resultDelete.rowCount === 0) return false;
+  if (resultDelete.rowCount === 0) {return false;}
 
   // 3. Borrar archivo físico
   const filePath = path.join(process.cwd(), "uploads", path.basename(url));

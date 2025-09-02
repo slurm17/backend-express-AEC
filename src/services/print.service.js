@@ -26,7 +26,7 @@ async function loadImageToEscposImage(imagePath, resizeWidth) {
     // Carga directa igual que antes
     return new Promise((resolve, reject) => {
       escpos.Image.load(imagePath, (image) => {
-        if (!image) return reject(new Error("No se pudo cargar la imagen"));
+        if (!image) {return reject(new Error("No se pudo cargar la imagen"));}
         resolve(image);
       });
     });
@@ -38,7 +38,7 @@ async function loadImageToEscposImage(imagePath, resizeWidth) {
 
       const image = await new Promise((resolve, reject) => {
         escpos.Image.load(tempPath, (img) => {
-          if (!img) return reject(new Error("No se pudo cargar la imagen redimensionada"));
+          if (!img) {return reject(new Error("No se pudo cargar la imagen redimensionada"));}
           resolve(img);
         });
       });
@@ -46,7 +46,7 @@ async function loadImageToEscposImage(imagePath, resizeWidth) {
       return image;
     } catch (error) {
       // Intentar borrar archivo temp si existe
-      try { await fs.unlink(tempPath); } catch {}
+      try { await fs.unlink(tempPath); } catch (e) {console.warn("No se pudo borrar temp:", e);}
       throw error;
     }
   }
@@ -71,7 +71,7 @@ export async function printTicket({ nombre, apellido, dni }) {
     printer.align("ct");
     printer.style("b");
     printer.size(1, 1);
-    printer.text("ATLÉTICO ECHAGÜE CLUB")
+    printer.text("ATLÉTICO ECHAGÜE CLUB");
     printer.image(logoClub, "d24");
     printer.text(""); // salto de línea
     
@@ -83,13 +83,13 @@ export async function printTicket({ nombre, apellido, dni }) {
     printer.text(`Nombre: ${nombre}`);
     printer.text(`Apellido: ${apellido}`);
     printer.text(`DNI: ${dni}`);
-    printer.text(`Emitido: ${fechaHora}`)
-    printer.text(`Vence: ${vencimiento}`)
+    printer.text(`Emitido: ${fechaHora}`);
+    printer.text(`Vence: ${vencimiento}`);
     printer.text(""); // salto de línea
 
     await new Promise((resolve, reject) => {
       printer.qrimage(`PASE-${dni}-${Date.now()}`, { type: "png", mode: "dhdw" }, (err) => {
-        if (err) return reject(err);
+        if (err) {return reject(err);}
         resolve();
       });
     });

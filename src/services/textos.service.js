@@ -1,5 +1,5 @@
 // src/services/texto.service.ts
-import { pool } from '../config/db.js'
+import { pool } from "../config/db.js";
 
 export const getAllTextos = async () => {
   const result = await pool.query("SELECT * FROM textos ORDER BY orden ASC");

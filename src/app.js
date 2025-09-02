@@ -1,11 +1,12 @@
 import express from "express";
 import cors from "cors";
 import routes from "./routes/index.js";
-import userRoutes from "./routes/user.routes.js"
+import userRoutes from "./routes/user.routes.js";
 import accessRoutes from "./routes/access.routes.js";
-import imagenRoutes from "./routes/imagenes.routes.js"
+import imagenRoutes from "./routes/imagenes.routes.js";
 import textosRoutes from "./routes/textos.routes.js";
 import printRoutes from "./routes/print.routes.js";
+import socioRoutes from "./routes/socios.routes.js";
 import path from "path";
 import http from "http";
 // import { SerialPort } from "serialport";
@@ -97,6 +98,7 @@ app.use("/api/access", accessRoutes);
 app.use("/api/imagenes", imagenRoutes);
 app.use("/api/textos", textosRoutes);
 app.use("/api/imprimir", printRoutes);
+app.use("/api/socios", socioRoutes);
 
 
 // app.use("/api", printRoutes);
