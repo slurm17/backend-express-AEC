@@ -3,6 +3,30 @@ import { findSocioByDni } from "../services/socios.service.js";
 
 import { resetIngresoRestante } from "../services/socios.service.js";
 
+// socios.controller.js
+import { getSociosAccess } from "../services/socios.service.js";
+
+export const getSociosAccessController = async (req, res) => {
+  try {
+    const { dni } = req.params; // o req.query.dni, según cómo definas la ruta
+
+    if (!dni) {
+      return res.status(400).json({ error: "DNI requerido" });
+    }
+
+    const socio = await getSociosAccess(dni);
+
+    if (!socio) {
+      return res.status(404).json({ error: "Socio no encontrado" });
+    }
+
+    return res.json(socio);
+  } catch (error) {
+    console.error("Error en getSociosAccessController:", error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 export const updateIngresoRestante = async (req, res) => {
   const { dni } = req.params;
   const { nuevoValor } = req.body;

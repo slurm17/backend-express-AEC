@@ -45,7 +45,7 @@ export const getSociosAccess = async (dni) => {
         }, 300); // delay opcional
       });
     }
-    const response = await fetch(`http://dbxp.ddns.net/api/socio1.php?id=${dni}`);
+    const response = await fetch(`${process.env.API_URL}?id=${dni}`);
     if (!response.ok) {
       throw new Error(`Error en la API: ${response.status}`);
     }
