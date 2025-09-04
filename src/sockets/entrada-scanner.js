@@ -1,9 +1,11 @@
 import { SERIAL } from "../config/constants.js";
-
 import { SerialPort } from "serialport";
 import { ReadlineParser } from "@serialport/parser-readline";
-import { activarRele } from "../services/relay.service.js";
-import { createSocio, findSocioByDni, getSociosAccess, resetIngresoRestante } from "../services/socios.service.js";
+// import { activarRele } from "../services/relay.service.js";
+import { createSocio, findSocioByDni, getSociosAccess } from "../services/socios.service.js";
+import { estadoSocioCero } from "../functions/estadoSocio/estadoSocioCero.js";
+import { estadoSocioDos } from "../functions/estadoSocio/estadoSocioDos.js";
+import { estadoSocioCinco } from "../functions/estadoSocio/estadoSocioCinco.js";
 
 export function entradaScanner(socketIo) {
     const io = socketIo;
@@ -55,60 +57,13 @@ export function entradaScanner(socketIo) {
                     socioLocalDb = socioDb;
                 }
                 if (dataSocio?.estado_socio === "0") {
-                    await resetIngresoRestante(dniLeido, 3);
-                    io.emit("scanner-entrada", {
-                        mensaje: "ACCESO PERMITIDO ✅",
-                        dni: dniLeido,
-                        socio : dataSocio,
-                    });
-                    activarRele(0); // Activar relé de ENTRADA
-                    return;
+                    await estadoSocioCero({ dni: dniLeido, io, socio: dataSocio });
                 }
                 if (dataSocio?.estado_socio === "2") {
-                    if (socioLocalDb.ingreso_restante > 0) {
-                        await resetIngresoRestante(dniLeido, socioLocalDb.ingreso_restante - 1);
-                        io.emit("scanner-entrada", {
-                            mensaje: `ACCESO PERMITIDO - CUOTA ATRASADA ❌ - ${socioLocalDb.ingreso_restante} INGRESOS RESTANTES`,
-                            dni: dniLeido,
-                            socio: dataSocio,
-                        });
-                        activarRele(0); // Activar relé de ENTRADA
-                    } else {
-                        io.emit("scanner-entrada", {
-                            mensaje: "ACCESO DENEGADO - CUOTA ATRASADA ❌",
-                            dni: dniLeido,
-                            socio: dataSocio,
-                        });
-                    }
-                    return;
+                    await estadoSocioDos({ dniLeido, io, socioLocalDb, dataSocio });
                 }
                 if (dataSocio?.estado_socio === "5") {
-                    const fechaEstado = new Date(dataSocio.fecha_estado);
-                    // Obtener mes y año de fecha_estado
-                    const mesEstado = fechaEstado.getMonth() + 1; // getMonth() va de 0 a 11
-                    const anioEstado = fechaEstado.getFullYear();
-                    // Obtener mes y año actual
-                    const fechaActual = new Date();
-                    const mesActual = fechaActual.getMonth() + 1;
-                    const anioActual = fechaActual.getFullYear();
-                    // Comparar
-                    if (mesEstado === mesActual && anioEstado === anioActual) {
-                        io.emit("scanner-entrada", {
-                            mensaje: "ACCESO PERMITIDO ✅",
-                            dni: dniLeido,
-                            socio: dataSocio,
-                        });
-                        activarRele(0); // Activar relé de ENTRADA
-                        console.log("Coinciden mes y año ✅");
-                    } else {
-                        io.emit("scanner-entrada", {
-                            mensaje: "ACCESO DENEGADO - SOCIO TEMPORARIO VENCIDO ❌",
-                            dni: dniLeido,
-                            socio: dataSocio,
-                        });
-                        console.log("No coinciden ❌");
-                    }
-                    return;
+                    await estadoSocioCinco({ dniLeido, io, dataSocio });
                 }
             }
         }
