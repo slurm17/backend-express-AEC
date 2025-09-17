@@ -8,7 +8,7 @@ export const  estadoSocioDos = async ({dniLeido, io, socioLocalDb, dataSocio}) =
         emitAndRegister({
                 io, 
                 mensaje: `ACCESO PERMITIDO - CUOTA ATRASADA ❌ - ${socioLocalDb.ingreso_restante - 1} INGRESOS RESTANTES`, 
-                data : { dniLeido, dataSocio },
+                data : dataSocio,
                 tipoPase : "socio",
                 dni: dniLeido,
                 estado : 2
@@ -23,7 +23,7 @@ export const  estadoSocioDos = async ({dniLeido, io, socioLocalDb, dataSocio}) =
         emitAndRegister({
                 io, 
                 mensaje: "ACCESO DENEGADO - CUOTA ATRASADA ❌", 
-                data : { dniLeido, dataSocio },
+                data : dataSocio,
                 tipoPase : "socio",
                 dni: dniLeido,
                 estado : 2

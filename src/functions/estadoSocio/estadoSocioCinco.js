@@ -2,6 +2,7 @@ import { emitAndRegister } from "../../functions/socket/emitAndRegister.js";
 import { activarRele } from "../../services/relay.service.js";
 
 export const estadoSocioCinco = async ({dniLeido, io, dataSocio}) => {
+    console.log("🚀 ~ estadoSocioCinco ~ dataSocio:", dataSocio)
     const fechaEstado = new Date(dataSocio.fecha_estado);
     // Obtener mes y año de fecha_estado
     const mesEstado = fechaEstado.getMonth() + 1; // getMonth() va de 0 a 11
@@ -15,7 +16,7 @@ export const estadoSocioCinco = async ({dniLeido, io, dataSocio}) => {
         emitAndRegister({
             io, 
             mensaje: "ACCESO PERMITIDO ✅", 
-            data : { dniLeido, dataSocio },
+            data : dataSocio,
             tipoPase : "socio",
             dni: dniLeido,
             estado : 5
@@ -31,7 +32,7 @@ export const estadoSocioCinco = async ({dniLeido, io, dataSocio}) => {
         emitAndRegister({
             io, 
             mensaje: "ACCESO DENEGADO - SOCIO TEMPORARIO VENCIDO ❌", 
-            data : { dniLeido, dataSocio },
+            data : dataSocio,
             tipoPase : "socio",
             dni: dniLeido,
             estado : 5

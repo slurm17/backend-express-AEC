@@ -30,7 +30,6 @@ export function entradaScanner(socketIo) {
             // });
             emitAndRegister({
                 io, 
-                data : {},
                 mensaje: "ERROR AL LEER EL CODIGO ❌", 
                 codigo_qr: dniLeido,
                 qr: true,
@@ -49,13 +48,11 @@ export function entradaScanner(socketIo) {
                 // });
                 emitAndRegister({
                     io, 
-                    data : {},
                     mensaje: "CODIGO QR NO ENCONTRADO ❌", 
                     codigo_qr: codigoQrLeido,
                     qr: true,
                 });
             }else{
-                console.log("🚀 ~ entradaScanner ~ dataCodigoQr:", dataCodigoQr)
                 // const fechaExp = new Date(dataCodigoQr.fecha_expiracion.replace(" ", "T"));
                 //Corregir fecha 
                 const fechaExp = new Date(dataCodigoQr.fecha_expiracion);
@@ -63,7 +60,7 @@ export function entradaScanner(socketIo) {
                 if (ahora > fechaExp) {
                     emitAndRegister({
                         io, 
-                        data : { dataCodigoQr },
+                        // data : { dataCodigoQr },
                         mensaje: "CODIGO QR VENCIDO ❌", 
                         codigo_qr: codigoQrLeido,
                         qr: true,
@@ -121,7 +118,7 @@ export function entradaScanner(socketIo) {
                     } else {
                         emitAndRegister({
                             io, 
-                            data : { dataCodigoQr },
+                            // data : { dataCodigoQr },
                             mensaje: "ERROR - NO COINCIDE ESTADO SOCIO ❌", 
                             codigo_qr: dniLeido,
                             qr: true,
@@ -138,7 +135,7 @@ export function entradaScanner(socketIo) {
                 } else if (dataCodigoQr.tipo === "invitado" || dataCodigoQr.tipo === "mantenimiento" || dataCodigoQr.tipo === "diario") {
                     emitAndRegister({
                         io, 
-                        data : { dataCodigoQr },
+                        // data : { dataCodigoQr },
                         mensaje: "ACCESO PERMITIDO ✅", 
                         codigo_qr: dniLeido,
                         qr: true,
@@ -155,7 +152,7 @@ export function entradaScanner(socketIo) {
                 } else {
                     emitAndRegister({
                         io, 
-                        data : { dataCodigoQr },
+                        // data : { dataCodigoQr },
                         mensaje: "ERROR - NO COINCIDE TIPO QR ❌", 
                         codigo_qr: dniLeido,
                         qr: true,
@@ -192,7 +189,7 @@ export function entradaScanner(socketIo) {
                     emitAndRegister({
                         io, 
                         mensaje: "SOCIO NO ENCONTRADO ❌", 
-                        data : { dni : dniLeido },
+                        // data : { dni : dniLeido },
                         dni: dniLeido,
                     });
                     console.log("SOCIO NO ENCONTRADO ❌");
@@ -228,11 +225,16 @@ export function entradaScanner(socketIo) {
                 }
             }
             catch (err) {
-                io.emit("scanner-entrada", {
-                    mensaje: "ERROR AL CONSULTAR SOCIO ❌",
-                    dni: dniLeido,
-                    socio : null,
+                emitAndRegister({
+                        io, 
+                        mensaje: "ERROR AL CONSULTAR SOCIO", 
+                        dni: dniLeido,
                 });
+                // io.emit("scanner-entrada", {
+                //     mensaje: "ERROR AL CONSULTAR SOCIO",
+                //     dni: dniLeido,
+                //     socio : null,
+                // });
                 console.error("Error:", err);
             }
         }

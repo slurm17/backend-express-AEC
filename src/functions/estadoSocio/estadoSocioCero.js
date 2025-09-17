@@ -4,12 +4,13 @@ import { activarRele } from "../../services/relay.service.js";
 import { resetIngresoRestante } from "../../services/socios.service.js";
 
 export const estadoSocioCero = async ({dni, io, socio}) => {
+    
     const config = await getConfiguracion();
     await resetIngresoRestante(dni, config?.ingreso_restante || 3);
     emitAndRegister({
         io, 
-        mensaje: "ACCESO PERMITIDO ✅", 
-        data : { dni, socio },
+        mensaje: process.env.MSG_ACCESO_PERMITIDO, 
+        data : socio,
         tipoPase : "socio",
         dni: dni,
         estado : 0
