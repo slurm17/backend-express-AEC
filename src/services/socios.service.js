@@ -1,6 +1,17 @@
 // socios.service.js
 import fetch from "node-fetch"; // solo si Node <18
 import { pool } from "../config/db.js"; // asumo que tenés el pool de pg configurado
+const dataFakeSocio = `
+{
+  "status": "ok",
+  "data": {
+    "num_socio": "17",
+    "nombre": "JUAN GUSTAVO SOSA",
+    "estado_socio": "2",
+    "fecha_estado": "2025-09-06 00:00:00"
+  }
+}
+`;
 
 export const findSocioByDni = async (dni) => {
   const query = "SELECT * FROM socios WHERE documento = $1";
@@ -23,17 +34,6 @@ export const resetIngresoRestante = async (dni, nuevoValor) => {
 };
 
 
-const dataFakeSocio = `
-{
-  "status": "ok",
-  "data": {
-    "num_socio": "17",
-    "nombre": "JUAN GUSTAVO SOSA",
-    "estado_socio": "0",
-    "fecha_estado": "2025-09-06 00:00:00"
-  }
-}
-`;
 const USE_FAKE = true; // 🔥 cambia a false para usar la API real
 
 export const getSociosAccess = async (dni) => {

@@ -1,6 +1,4 @@
 import * as imagenService from "../services/imagen.service.js";
-import fs from "fs";
-import path from "path";
 
 export const getImagenes = async (req, res, next) => {
   try {

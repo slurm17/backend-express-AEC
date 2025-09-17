@@ -5,13 +5,15 @@ import fs from "fs/promises";
 import escposNetwork from "escpos-network";
 // const fs = require("fs").promises;
 import moment from "moment";
+import { fileURLToPath } from "url";
 
 escpos.Network = escposNetwork;
 // escpos.Network = require("escpos-network");
 
-const PRINTER_IP = "192.168.1.201";
+const PRINTER_IP = "192.168.0.53";
 const PRINTER_PORT = 9100;
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 /**
  * Carga imagen para escpos.
  * Si resizeWidth está definido, redimensiona la imagen al ancho indicado antes de cargar.
@@ -52,7 +54,15 @@ async function loadImageToEscposImage(imagePath, resizeWidth) {
   }
 }
 
-export async function printTicket({ nombre, apellido, dni }) {
+// Pasar como param fech emision y venc en formato isoString "YYYY-MM-DDTHH:mm:ssZ"
+export async function printTicket({ 
+    nombre, 
+    apellido = "", 
+    dni, 
+    codigo, 
+    fechaEmision : fechaHora, 
+    fechaVencimiento: vencimiento 
+  }) {
   const device = new escpos.Network(PRINTER_IP, PRINTER_PORT);
   const printer = new escpos.Printer(device);
 
@@ -61,11 +71,10 @@ export async function printTicket({ nombre, apellido, dni }) {
     console.log("Conectado a la impresora.");
 
     // Redimensiono logoClub a ancho 150px, logoNetter sin redimensionar
-    const logoClub = await loadImageToEscposImage(path.join(__dirname, "public/img/logo-club.png"), 250);
-    const logoNetter = await loadImageToEscposImage(path.join(__dirname, "public/img/logo-netter.png"),205);
-    const fechaHora = moment().format("DD/MM/YYYY HH:mm");
-    const vencimiento = moment().add(1, "days").hour(8).minute(0).format("DD/MM/YYYY HH:mm");
-
+    const logoClub = await loadImageToEscposImage(path.join(__dirname, "../../public/img/logo-club.png"), 250);
+    const logoNetter = await loadImageToEscposImage(path.join(__dirname, "../../public/img/logo-netter.png"),205);
+    // const fechaHora = moment().format("DD/MM/YYYY HH:mm");
+    // const vencimiento = moment().add(1, "days").hour(8).minute(0).format("DD/MM/YYYY HH:mm");
     //printer.encode("UTF-8");
     printer.encode("CP858");
     printer.align("ct");
@@ -75,20 +84,23 @@ export async function printTicket({ nombre, apellido, dni }) {
     printer.image(logoClub, "d24");
     printer.text(""); // salto de línea
     
+    //DEFINIR TIPO DE PASE VARIABLE
+
     printer.text("PASE DIARIO");
     printer.text(""); // salto de línea
 
     printer.style("normal");
     printer.size(0, 0);
     printer.text(`Nombre: ${nombre}`);
-    printer.text(`Apellido: ${apellido}`);
+    {apellido && printer.text(`Apellido: ${apellido}`);}
     printer.text(`DNI: ${dni}`);
     printer.text(`Emitido: ${fechaHora}`);
     printer.text(`Vence: ${vencimiento}`);
     printer.text(""); // salto de línea
 
     await new Promise((resolve, reject) => {
-      printer.qrimage(`PASE-${dni}-${Date.now()}`, { type: "png", mode: "dhdw" }, (err) => {
+      printer.qrimage(`${codigo}`, { type: "png", mode: "dhdw" }, (err) => {
+      // printer.qrimage(`PASE-${dni}-${Date.now()}`, { type: "png", mode: "dhdw" }, (err) => {
         if (err) {return reject(err);}
         resolve();
       });
@@ -107,7 +119,6 @@ export async function printTicket({ nombre, apellido, dni }) {
 
     await new Promise((resolve, reject) => printer.flush(err => (err ? reject(err) : resolve())));
     await new Promise((resolve, reject) => device.close(err => (err ? reject(err) : resolve())));
-
     console.log("Ticket impreso correctamente.");
   } catch (error) {
     console.error("Error imprimiendo ticket:", error);

@@ -7,6 +7,8 @@ import imagenRoutes from "./routes/imagenes.routes.js";
 import textosRoutes from "./routes/textos.routes.js";
 import printRoutes from "./routes/print.routes.js";
 import socioRoutes from "./routes/socios.routes.js";
+import qrRoutes from "./routes/qr.routes.js";
+import configRoutes from "./routes/configuracion.routes.js";
 import path from "path";
 import http from "http";
 // import { SerialPort } from "serialport";
@@ -28,59 +30,9 @@ const app = express();
 const server = http.createServer(app);
 
 // PRUEBAS DE ACCESO SOCIO
-
 const io = initIo(server);
 entradaScanner(io);
 salidaScanner(io);
-
-// let socioValido = {
-//   dni: "29855048",
-//   nombre: "Jose Francisco",
-//   apellido: "Igarza",
-//   nroSocio: "36476",
-//   cuentaAlDia: false // Cambiar a false para simular cuota vencida
-// };
-
-// const io = new Server(server, {
-//   cors: {
-//     origin: ["http://localhost:5173", "http://localhost:5174"], // puerto de tu frontend (Vite en este ejemplo)
-//     methods: ["GET", "POST"]
-//   }
-// });
-// const port = new SerialPort({
-//   path: SERIAL.ENTRADA,
-//   baudRate: SERIAL.BAUD_RATE
-// });
-// const parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
-// server.listen(4000, () => {
-//   console.log("Servidor corriendo en http://localhost:4000");
-// });
-// parser.on("data", (data) => {
-//   const dniLeido = data.trim();
-//   console.log("DNI leído:", dniLeido);
-//   let estado = "";
-//   let socio = null;
-
-//   if (dniLeido === socioValido.dni) {
-//     socio = socioValido;
-//     if (socio.cuentaAlDia) {
-//       estado = "ACCESO PERMITIDO ✅";
-//       activarRele(0);
-//     } else {
-//       estado = "ACCESO DENEGADO - CUOTA ATRASADA ❌";
-//     }
-//   } else {
-//     estado = "SOCIO INVÁLIDO ⚠️";
-//   }
-
-//   io.emit("resultado-socio", {
-//     dni: dniLeido,
-//     socio,
-//     estado
-//   });
-// });
-
-// ------------------------------------------------
 
 // Middlewares
 app.use(cors());
@@ -99,6 +51,8 @@ app.use("/api/imagenes", imagenRoutes);
 app.use("/api/textos", textosRoutes);
 app.use("/api/imprimir", printRoutes);
 app.use("/api/socios", socioRoutes);
+app.use("/api/qr", qrRoutes);
+app.use("/api/config", configRoutes);
 
 
 // app.use("/api", printRoutes);

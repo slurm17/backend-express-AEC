@@ -15,8 +15,8 @@ import { printTicket } from "../services/print.service.js";
 
 export const imprimirTicket = async (req, res, next) => {
   try {
-    const { nombre, apellido, dni } = req.body;
-    await printTicket({ nombre, apellido, dni });
+    const { nombre, apellido, dni, codigo, fechaEmision, fechaVencimiento } = req.body;
+    await printTicket({ nombre, apellido, dni, codigo, fechaEmision, fechaVencimiento });
     res.json({ message: "Ticket enviado a imprimir" });
   } catch (error) {
     console.error("Error al imprimir:", error);
