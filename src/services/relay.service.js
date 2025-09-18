@@ -16,12 +16,15 @@ export const activarRele = async (puerto) => {
       console.log("Relé desactivado");
       client.close();
     }, 2000);
+    return { success: true };
+
   } catch (err) {
     if (err instanceof Error) {
       console.error("Error Modbus:", err.message);
     } else {
       console.error("Error Modbus:", err);
     }
+    return { success: false, error: err.message };
   }
 }
 

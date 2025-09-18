@@ -94,8 +94,8 @@ export async function printTicket({
     printer.text(`Nombre: ${nombre}`);
     {apellido && printer.text(`Apellido: ${apellido}`);}
     printer.text(`DNI: ${dni}`);
-    printer.text(`Emitido: ${fechaHora}`);
-    printer.text(`Vence: ${vencimiento}`);
+    printer.text(`Emitido: ${ moment(fechaHora).format("DD/MM/YYYY HH:mm")}`);
+    printer.text(`Vence: ${moment(vencimiento).format("DD/MM/YYYY HH:mm")}`);
     printer.text(""); // salto de línea
 
     await new Promise((resolve, reject) => {

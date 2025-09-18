@@ -1,9 +1,11 @@
+import { getConfiguracion } from "../../services/configuracion.service.js";
 import { emitAndRegister } from "../../functions/socket/emitAndRegister.js";
 import { activarRele } from "../../services/relay.service.js";
 import { resetIngresoRestante } from "../../services/socios.service.js";
 
 export const  estadoSocioDos = async ({dniLeido, io, socioLocalDb, dataSocio}) => {
-    if (socioLocalDb.ingreso_restante > 0) {
+    const config = await getConfiguracion();
+    if (config?.pase_permitidos > 0 && socioLocalDb.ingreso_restante > 0) {
         await resetIngresoRestante(dniLeido, socioLocalDb.ingreso_restante - 1);
         emitAndRegister({
                 io, 

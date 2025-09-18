@@ -2,7 +2,7 @@ export const WEB_PORT = 3000;
 
 export const SERIAL = {
   ENTRADA: "COM6",
-  SALIDA: "COM7",
+  SALIDA: "COM10",
   BAUD_RATE: 115200,
 };
 
@@ -16,6 +16,6 @@ export const MODBUS = {
 
 // VERIFICAR VARIABLE
 export const PRINTER = {
-  IP: "192.168.1.201",
+  IP: "192.168.0.53",
   PORT: 9100,
 };

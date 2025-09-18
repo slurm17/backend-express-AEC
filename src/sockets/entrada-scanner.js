@@ -2,13 +2,14 @@ import { SERIAL } from "../config/constants.js";
 import { SerialPort } from "serialport";
 import { ReadlineParser } from "@serialport/parser-readline";
 import { activarRele } from "../services/relay.service.js";
-import { createSocio, findSocioByDni, getSociosAccess } from "../services/socios.service.js";
+import { createSocio, findSocioByDni, getSociosAccess, updateSocio } from "../services/socios.service.js";
 import { estadoSocioCero } from "../functions/estadoSocio/estadoSocioCero.js";
 import { estadoSocioDos } from "../functions/estadoSocio/estadoSocioDos.js";
 import { estadoSocioCinco } from "../functions/estadoSocio/estadoSocioCinco.js";
 import { findCodigoQrByCodigo } from "../services/qr.service.js";
 import { getConfiguracion } from "../services/configuracion.service.js";
 import { emitAndRegister } from "../functions/socket/emitAndRegister.js";
+import moment from "moment-timezone";
 
 export function entradaScanner(socketIo) {
     const io = socketIo;
@@ -40,6 +41,7 @@ export function entradaScanner(socketIo) {
             console.log("DNI leido ENTRADA:", dniLeido);
             const codigoQrLeido = dniLeido;
             const dataCodigoQr = await findCodigoQrByCodigo(codigoQrLeido);
+            // console.log("🚀 ~ entradaScanner ~ dataCodigoQr:", dataCodigoQr)
             if (!dataCodigoQr) {
                 // io.emit("scanner-entrada", {
                 //     mensaje: "CODIGO QR NO ENCONTRADO ❌",
@@ -53,11 +55,13 @@ export function entradaScanner(socketIo) {
                     qr: true,
                 });
             }else{
-                // const fechaExp = new Date(dataCodigoQr.fecha_expiracion.replace(" ", "T"));
                 //Corregir fecha 
-                const fechaExp = new Date(dataCodigoQr.fecha_expiracion);
-                const ahora = new Date();
-                if (ahora > fechaExp) {
+                const fechaExp = moment.tz(dataCodigoQr.fecha_venc, "America/Argentina/Buenos_Aires");
+                const ahora = moment.tz("America/Argentina/Buenos_Aires");
+                // console.log("🚀 ~ entradaScanner ~ fechaExp:", fechaExp)
+                // console.log("🚀 ~ entradaScanner ~ ahora:", ahora)
+                if (ahora.isAfter(fechaExp)) {
+                // if (ahora > fechaExp) {
                     emitAndRegister({
                         io, 
                         // data : { dataCodigoQr },
@@ -87,12 +91,17 @@ export function entradaScanner(socketIo) {
                             estado: parseInt(dataSocioQrAccess.estado_socio, 10),
                             nro_socio: dataSocioQrAccess.num_socio,
                             fecha_estado: dataSocioQrAccess.fecha_estado,
-                            ingreso_restante: config?.ingreso_restante || 3, 
+                            ingreso_restante: config?.pase_permitidos, 
                         }).then((nuevoSocio) => {
                             socioLocalDbQr = nuevoSocio;
                         });
                     }else{
                         socioLocalDbQr = socioDbQR;
+                        await updateSocio({
+                            dni: parseInt(dataCodigoQr.documento, 10), // dniLeido,
+                            nuevoEstado: parseInt(dataSocioQrAccess.estado_socio, 10),
+                            nuevaFecha: dataSocioQrAccess.fecha_estado
+                        })
                     }
                     if (dataSocioQrAccess?.estado_socio === "0") {
                         await estadoSocioCero({ 
@@ -179,6 +188,7 @@ export function entradaScanner(socketIo) {
             });
             try {
                 // Consultar API externa 
+                console.log("🚀 ~ entradaScanner ~ dniLeido:", dniLeido)
                 const dataSocio = await getSociosAccess(dniLeido);
                 if (!dataSocio) {
                     // io.emit("scanner-entrada", {
@@ -198,6 +208,7 @@ export function entradaScanner(socketIo) {
                     const socioDb = await findSocioByDni(dniLeido);
                     // Si no existe, crearlo
                     if (!socioDb) {
+                        const config = await getConfiguracion();
                         await createSocio({
                             documento: dniLeido,
                             nom_y_ap: dataSocio.nombre,
@@ -205,13 +216,18 @@ export function entradaScanner(socketIo) {
                             nro_socio: dataSocio.num_socio,
                             fecha_estado: dataSocio.fecha_estado,
                             // Corregir con config db
-                            ingreso_restante: 3, 
+                            ingreso_restante: config?.pase_permitidos
                         }).then((nuevoSocio) => {
                             socioLocalDb = nuevoSocio;
                             console.log("Nuevo socio creado:", nuevoSocio);
                         });
                     }else {
                         socioLocalDb = socioDb;
+                        await updateSocio({
+                            dni: parseInt(dniLeido, 10), // dniLeido,
+                            nuevoEstado: parseInt(dataSocio.estado_socio, 10),
+                            nuevaFecha: dataSocio.fecha_estado
+                        })
                     }
                     if (dataSocio?.estado_socio === "0") {
                         await estadoSocioCero({ dni: dniLeido, io, socio: dataSocio });

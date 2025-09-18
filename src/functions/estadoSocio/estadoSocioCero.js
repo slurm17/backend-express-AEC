@@ -5,8 +5,9 @@ import { resetIngresoRestante } from "../../services/socios.service.js";
 
 export const estadoSocioCero = async ({dni, io, socio}) => {
     
+    // try catch por si la consulta falla
     const config = await getConfiguracion();
-    await resetIngresoRestante(dni, config?.ingreso_restante || 3);
+    await resetIngresoRestante(dni, config?.pase_permitidos);
     emitAndRegister({
         io, 
         mensaje: process.env.MSG_ACCESO_PERMITIDO, 

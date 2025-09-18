@@ -1,6 +1,6 @@
 import pkg from "pg";
 import dotenv from "dotenv";
-
+pkg.types.setTypeParser(1184, str => str);
 const { Pool } = pkg;
 dotenv.config();
 

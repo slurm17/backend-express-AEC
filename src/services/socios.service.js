@@ -7,12 +7,14 @@ const dataFakeSocio = `
   "data": {
     "num_socio": "17",
     "nombre": "JUAN GUSTAVO SOSA",
-    "estado_socio": "5",
+    "estado_socio": "0",
     "fecha_estado": "2025-09-06 00:00:00"
   }
 }
 `;
 
+const USE_FAKE = false; // 🔥 cambia a false para usar la API real
+    
 export const findSocioByDni = async (dni) => {
   const query = "SELECT * FROM socios WHERE documento = $1";
   const values = [dni];
@@ -33,8 +35,20 @@ export const resetIngresoRestante = async (dni, nuevoValor) => {
   return result.rows[0] || null;
 };
 
+export const updateSocio = async ({dni, nuevoEstado, nuevaFecha} ) => {
+  const query = `
+    UPDATE socios
+    SET estado = $1, fecha_estado = $2
+    WHERE documento = $3
+    RETURNING *;
+  `;
+  const values = [nuevoEstado, nuevaFecha, dni];
 
-const USE_FAKE = true; // 🔥 cambia a false para usar la API real
+  const result = await pool.query(query, values);
+  return result.rows[0] || null;
+};
+
+
 
 export const getSociosAccess = async (dni) => {
     if (USE_FAKE) {
@@ -45,7 +59,7 @@ export const getSociosAccess = async (dni) => {
         }, 300); // delay opcional
       });
     }
-    const response = await fetch(`${process.env.API_URL}?id=${dni}`);
+    const response = await fetch(`${process.env.API_URL_ACCESS}?id=${dni}`);
     if (!response.ok) {
       throw new Error(`Error en la API: ${response.status}`);
     }

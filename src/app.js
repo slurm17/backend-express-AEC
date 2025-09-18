@@ -9,6 +9,7 @@ import printRoutes from "./routes/print.routes.js";
 import socioRoutes from "./routes/socios.routes.js";
 import qrRoutes from "./routes/qr.routes.js";
 import configRoutes from "./routes/configuracion.routes.js";
+import releRoutes from "./routes/rele.routes.js";
 import path from "path";
 import http from "http";
 // import { SerialPort } from "serialport";
@@ -53,6 +54,7 @@ app.use("/api/imprimir", printRoutes);
 app.use("/api/socios", socioRoutes);
 app.use("/api/qr", qrRoutes);
 app.use("/api/config", configRoutes);
+app.use("/api/rele", releRoutes);
 
 
 // app.use("/api", printRoutes);
