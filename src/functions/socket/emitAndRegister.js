@@ -1,7 +1,15 @@
 import { createEvento } from "../../services/reg-evento.service.js";
 
 export const emitAndRegister = ({
-    io, mensaje="", data = {}, tipoPase = "", qr = false, codigo_qr = null, dni = "", estado = null,
+    io, 
+    mensaje="", 
+    data = {}, 
+    tipoPase = "", 
+    qr = false, 
+    codigo_qr = null, 
+    dni = "", 
+    estado = null,
+    error = false
 }) => {
     io.emit("scanner-entrada", {
         mensaje,
@@ -10,7 +18,7 @@ export const emitAndRegister = ({
             num_socio: data?.num_socio || null,
             dni
         }
-    });
+    })
     createEvento({
         tipo: "E",
         tipo_pase: tipoPase,
@@ -19,5 +27,6 @@ export const emitAndRegister = ({
         dni,
         estado,
         mensaje,
+        error_event : error
     })
 };

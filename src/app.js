@@ -55,7 +55,11 @@ app.use("/api/socios", socioRoutes);
 app.use("/api/qr", qrRoutes);
 app.use("/api/config", configRoutes);
 app.use("/api/rele", releRoutes);
-
+const staticDir = path.resolve(process.cwd(), "public", "fotos-socios");
+app.use("/fotos-socios", express.static(staticDir));
+app.use("/fotos-socios", (req, res) => {
+  res.status(404).json({ error: "Imagen no encontrada" });
+});
 
 // app.use("/api", printRoutes);
 

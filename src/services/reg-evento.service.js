@@ -20,8 +20,8 @@ export const getAllEventos = async () => {
 export const createEvento = async (evento) => {
   console.log("🚀 ~ createEvento ~ evento:", evento)
   const result = await pool.query(
-    `INSERT INTO reg_evento (tipo, tipo_pase, qr, codigo_qr, dni, fecha_hora, mensaje, estado)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+    `INSERT INTO reg_evento (tipo, tipo_pase, qr, codigo_qr, dni, fecha_hora, mensaje, estado, error_event)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
     [
       evento.tipo,
       evento.tipo_pase,
@@ -30,7 +30,8 @@ export const createEvento = async (evento) => {
       evento.dni,
       evento.fecha_hora || new Date(),
       evento.mensaje || null,
-      evento.estado ?? null
+      evento.estado ?? null,
+      evento.error_event
     ]
   );
   return result.rows[0];

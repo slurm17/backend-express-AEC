@@ -24,16 +24,12 @@ export function entradaScanner(socketIo) {
     parser.on("data", async (data) => {
         const dniLeido = data.trim();
         if (!dniLeido){
-            // io.emit("scanner-entrada", {
-            //     mensaje: "ERROR AL LEER EL CODIGO ❌",
-            //     dni: dniLeido,
-            //     socio : null,
-            // });
             emitAndRegister({
                 io, 
-                mensaje: "ERROR AL LEER EL CODIGO ❌", 
+                mensaje: "⛔️ ERROR AL LEER EL CODIGO", 
                 codigo_qr: dniLeido,
                 qr: true,
+                error : true
             });
         }
         // Si tiene mas de 9 digitos es codigo qr sino es dni de la tarjeta de socio
@@ -43,40 +39,28 @@ export function entradaScanner(socketIo) {
             const dataCodigoQr = await findCodigoQrByCodigo(codigoQrLeido);
             // console.log("🚀 ~ entradaScanner ~ dataCodigoQr:", dataCodigoQr)
             if (!dataCodigoQr) {
-                // io.emit("scanner-entrada", {
-                //     mensaje: "CODIGO QR NO ENCONTRADO ❌",
-                //     dni: dniLeido,
-                //     socio : null,
-                // });
                 emitAndRegister({
                     io, 
-                    mensaje: "CODIGO QR NO ENCONTRADO ❌", 
+                    mensaje: "⛔️ CODIGO QR NO ENCONTRADO", 
                     codigo_qr: codigoQrLeido,
                     qr: true,
+                    error : true
                 });
             }else{
                 //Corregir fecha 
                 const fechaExp = moment.tz(dataCodigoQr.fecha_venc, "America/Argentina/Buenos_Aires");
                 const ahora = moment.tz("America/Argentina/Buenos_Aires");
-                // console.log("🚀 ~ entradaScanner ~ fechaExp:", fechaExp)
-                // console.log("🚀 ~ entradaScanner ~ ahora:", ahora)
                 if (ahora.isAfter(fechaExp)) {
                 // if (ahora > fechaExp) {
                     emitAndRegister({
                         io, 
-                        // data : { dataCodigoQr },
-                        mensaje: "CODIGO QR VENCIDO ❌", 
+                        mensaje: "⛔️ CODIGO QR VENCIDO", 
                         codigo_qr: codigoQrLeido,
                         qr: true,
                         tipoPase : dataCodigoQr.tipo,
                         dni: dataCodigoQr.documento,
+                        error : true
                     });
-                    // io.emit("scanner-entrada", {
-                    //     mensaje: "CODIGO QR VENCIDO ❌",
-                    //     dni: dniLeido,
-                    //     socio : null,
-                    // });
-                    // console.log("CODIGO QR VENCIDO ❌");
                 }
                 else if(dataCodigoQr.tipo === "socio") {
                     let socioLocalDbQr = null;
@@ -128,52 +112,34 @@ export function entradaScanner(socketIo) {
                         emitAndRegister({
                             io, 
                             // data : { dataCodigoQr },
-                            mensaje: "ERROR - NO COINCIDE ESTADO SOCIO ❌", 
+                            mensaje: "⛔️ ERROR - NO COINCIDE ESTADO SOCIO", 
                             codigo_qr: dniLeido,
                             qr: true,
                             tipoPase : dataCodigoQr.tipo,
                             dni: dataCodigoQr.documento,
+                            error : true
                         });
-                        // io.emit("scanner-entrada", {
-                        //     mensaje: "ERROR - NO COINCIDE ESTADO SOCIO ❌",
-                        //     dni: dniLeido,
-                        //     socio : null,
-                        // });
-                        console.log("ERROR - NO COINCIDE ESTADO SOCIO ❌");
                     }
                 } else if (dataCodigoQr.tipo === "invitado" || dataCodigoQr.tipo === "mantenimiento" || dataCodigoQr.tipo === "diario") {
                     emitAndRegister({
                         io, 
-                        // data : { dataCodigoQr },
-                        mensaje: "ACCESO PERMITIDO ✅", 
+                        mensaje: "✅ ACCESO PERMITIDO", 
                         codigo_qr: dniLeido,
                         qr: true,
                         tipoPase : dataCodigoQr.tipo,
                         dni: dataCodigoQr.documento,
                     });
-                    
-                    // io.emit("scanner-entrada", {
-                    //     mensaje: "ACCESO PERMITIDO ✅",
-                    //     dni: dniLeido,
-                    //     socio : null,
-                    // });
                     activarRele(0); // Activar relé de ENTRADA
                 } else {
                     emitAndRegister({
                         io, 
-                        // data : { dataCodigoQr },
-                        mensaje: "ERROR - NO COINCIDE TIPO QR ❌", 
+                        mensaje: "⛔️ ERROR - NO COINCIDE TIPO QR", 
                         codigo_qr: dniLeido,
                         qr: true,
                         tipoPase : dataCodigoQr.tipo,
                         dni: dataCodigoQr.documento,
+                        error : true
                     });
-                    // io.emit("scanner-entrada", {
-                    //     mensaje: "ERROR - NO COINCIDE TIPO QR ❌",
-                    //     dni: dniLeido,
-                    //     socio : null,
-                    // });
-                    console.log("ERROR - NO COINCIDE TIPO QR ❌");
                 }
             }
             // console.log("🚀 ~ entradaScanner ~ dataCodigoQr:", dataCodigoQr)
@@ -181,28 +147,17 @@ export function entradaScanner(socketIo) {
             return
         } else {
             let socioLocalDb = null;
-            io.emit("scanner-entrada", {
-                mensaje: "ESPERE POR FAVOR... ⏳",
-                dni: dniLeido,
-                socio : null,
-            });
             try {
                 // Consultar API externa 
                 console.log("🚀 ~ entradaScanner ~ dniLeido:", dniLeido)
                 const dataSocio = await getSociosAccess(dniLeido);
                 if (!dataSocio) {
-                    // io.emit("scanner-entrada", {
-                    //     mensaje: "SOCIO NO ENCONTRADO ❌",
-                    //     dni: dniLeido,
-                    //     socio : null,
-                    // });
                     emitAndRegister({
-                        io, 
-                        mensaje: "SOCIO NO ENCONTRADO ❌", 
-                        // data : { dni : dniLeido },
+                        io,
+                        mensaje: "⛔️ SOCIO NO ENCONTRADO", 
                         dni: dniLeido,
+                        error : true
                     });
-                    console.log("SOCIO NO ENCONTRADO ❌");
                 } else {
                     // Buscar en la base de datos local  
                     const socioDb = await findSocioByDni(dniLeido);
@@ -242,19 +197,13 @@ export function entradaScanner(socketIo) {
             }
             catch (err) {
                 emitAndRegister({
-                        io, 
-                        mensaje: "ERROR AL CONSULTAR SOCIO", 
-                        dni: dniLeido,
+                    io, 
+                    mensaje: "⛔️ ERROR AL CONSULTAR SOCIO", 
+                    dni: dniLeido,
+                    error : true
                 });
-                // io.emit("scanner-entrada", {
-                //     mensaje: "ERROR AL CONSULTAR SOCIO",
-                //     dni: dniLeido,
-                //     socio : null,
-                // });
-                console.error("Error:", err);
             }
         }
-        
     })
     port.on("error", (err) => {
         console.error("Error en el puerto serie ENTRADA: ", err.message);

@@ -2,6 +2,7 @@ import { emitAndRegister } from "../../functions/socket/emitAndRegister.js";
 import { activarRele } from "../../services/relay.service.js";
 
 export const estadoSocioCinco = async ({dniLeido, io, dataSocio}) => {
+    // CONTROLAR FECHAS
     console.log("🚀 ~ estadoSocioCinco ~ dataSocio:", dataSocio)
     const fechaEstado = new Date(dataSocio.fecha_estado);
     // Obtener mes y año de fecha_estado
@@ -21,13 +22,7 @@ export const estadoSocioCinco = async ({dniLeido, io, dataSocio}) => {
             dni: dniLeido,
             estado : 5
         });
-        // io.emit("scanner-entrada", {
-        //     mensaje: "ACCESO PERMITIDO ✅",
-        //     dni: dniLeido,
-        //     socio: dataSocio,
-        // });
         activarRele(0); // Activar relé de ENTRADA
-        console.log("Coinciden mes y año ✅");
     } else {
         emitAndRegister({
             io, 
@@ -35,13 +30,8 @@ export const estadoSocioCinco = async ({dniLeido, io, dataSocio}) => {
             data : dataSocio,
             tipoPase : "socio",
             dni: dniLeido,
-            estado : 5
+            estado : 5,
+            error : true
         });
-        // io.emit("scanner-entrada", {
-        //     mensaje: "ACCESO DENEGADO - SOCIO TEMPORARIO VENCIDO ❌",
-        //     dni: dniLeido,
-        //     socio: dataSocio,
-        // });
-        console.log("No coinciden ❌");
     }
 }
