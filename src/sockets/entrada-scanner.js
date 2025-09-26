@@ -120,7 +120,7 @@ export function entradaScanner(socketIo) {
                             error : true
                         });
                     }
-                } else if (dataCodigoQr.tipo === "invitado" || dataCodigoQr.tipo === "mantenimiento" || dataCodigoQr.tipo === "diario") {
+                } else if (dataCodigoQr.tipo === "mantenimiento" || dataCodigoQr.tipo === "diario") {
                     emitAndRegister({
                         io, 
                         mensaje: "✅ ACCESO PERMITIDO", 
@@ -130,6 +130,32 @@ export function entradaScanner(socketIo) {
                         dni: dataCodigoQr.documento,
                     });
                     activarRele(0); // Activar relé de ENTRADA
+                } else if (dataCodigoQr.tipo === "invitado") {
+                    // Controlo si la fecha del inicio del evento ya comenzó
+                    const fechaEmitido = moment.tz(dataCodigoQr.fecha_emitido, "America/Argentina/Buenos_Aires");
+                    const ahora = moment.tz("America/Argentina/Buenos_Aires");
+                    if (ahora.isBefore(fechaEmitido)) {
+                        emitAndRegister({
+                            io, 
+                            mensaje: "⛔️ ESTE PASE PERTENCE A UN EVENTO QUE AUN NO HA COMENZADO", 
+                            codigo_qr: dniLeido,
+                            qr: true,
+                            tipoPase : dataCodigoQr.tipo,
+                            dni: dataCodigoQr.documento,
+                            error : true
+                        });
+                        return;
+                    }else{
+                        emitAndRegister({
+                            io,
+                            mensaje: "✅ ACCESO PERMITIDO",
+                            codigo_qr: dniLeido,
+                            qr: true,
+                            tipoPase : dataCodigoQr.tipo,
+                            dni: dataCodigoQr.documento,
+                        })
+                        activarRele(0); // Activar relé de ENTRADA
+                    }
                 } else {
                     emitAndRegister({
                         io, 
