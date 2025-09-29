@@ -7,7 +7,7 @@ import fetch from "node-fetch";
 import { createEvento } from "../services/reg-evento.service.js";
 import { findCodigoQrByCodigo } from "../services/qr.service.js";
 import { getSociosAccess } from "../services/socios.service.js";
-import { activarRele } from "../services/relay.service.js";
+import { activarReleSalida } from "../services/relay-salida.service.js";
 
 export function salidaScanner(socketIo) {
     const io = socketIo;
@@ -42,7 +42,7 @@ export function salidaScanner(socketIo) {
                     mensaje,
                 })
             } else {
-                activarRele(1); // Activar relé de SALIDA
+                activarReleSalida(1); // Activar relé de SALIDA
                 createEvento({
                     tipo: "S",
                     tipo_pase: dataCodigoQr?.tipo,
@@ -72,7 +72,7 @@ export function salidaScanner(socketIo) {
                 mensaje,
             })
         } else {
-            activarRele(1); // Activar relé de SALIDA
+            activarReleSalida(1); // Activar relé de SALIDA
             createEvento({
                 tipo: "S",
                 tipo_pase: "socio",

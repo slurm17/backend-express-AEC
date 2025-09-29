@@ -2,22 +2,16 @@ import { MODBUS } from "../config/constants.js";
 // @ts-ignore
 import ModbusRTU from "modbus-serial";
 
-export const activarRele = async (puerto) => {
+export const activarReleLibre = async (puerto) => {
   const client = new ModbusRTU();
   try {
     await client.connectTCP(MODBUS.RELAY_IP, { port: MODBUS.RELAY_PORT });
     client.setID(MODBUS.RELAY_ID);
-
-    await client.writeCoil(puerto, true);
+    const estado = await client.readCoils(puerto, 1)//.then(data => data.data[puerto]);
+    await client.writeCoil(puerto, !estado.data[puerto]);
     console.log("Relé activado");
 
-    setTimeout(async () => {
-      await client.writeCoil(puerto, false);
-      console.log("Relé desactivado");
-      client.close();
-    }, 300);
     return { success: true };
-
   } catch (err) {
     if (err instanceof Error) {
       console.error("Error Modbus:", err.message);
@@ -25,6 +19,8 @@ export const activarRele = async (puerto) => {
       console.error("Error Modbus:", err);
     }
     return { success: false, error: err.message };
+  }finally {
+    client.close(); // 🔑 importante
   }
 }
 

@@ -15,6 +15,7 @@ dist-electron
 dist-ssr
 *.local
 .env
+public/fotos-socios
 
 # Editor directories and files
 .vscode/*

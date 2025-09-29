@@ -2,7 +2,7 @@ export const WEB_PORT = 3000;
 
 export const SERIAL = {
   ENTRADA: "COM6",
-  SALIDA: "COM10",
+  SALIDA: "COM4",
   BAUD_RATE: 115200,
 };
 
