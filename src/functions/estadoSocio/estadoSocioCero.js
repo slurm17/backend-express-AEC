@@ -10,7 +10,7 @@ export const estadoSocioCero = async ({dni, io, socio}) => {
     await resetIngresoRestante(dni, config?.pase_permitidos);
     emitAndRegister({
         io, 
-        mensaje: process.env.MSG_ACCESO_PERMITIDO, 
+        mensaje: "BIENVENIDO AL CLUB", 
         data : socio,
         tipoPase : "socio",
         dni: dni,

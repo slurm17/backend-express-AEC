@@ -15,12 +15,12 @@ import { printTicket } from "../services/print.service.js";
 
 export const imprimirTicket = async (req, res, next) => {
   try {
-    const { nombre, apellido, dni, codigo, fechaEmision, fechaVencimiento } = req.body;
-    await printTicket({ nombre, apellido, dni, codigo, fechaEmision, fechaVencimiento });
+    const { nombre, apellido, dni, codigo, fechaEmision, fechaVencimiento, tipoDePase= "PASE QR" } = req.body;
+    await printTicket({ nombre, apellido, dni, codigo, fechaEmision, fechaVencimiento, tipoDePase });
     res.json({ message: "Ticket enviado a imprimir" });
   } catch (error) {
     console.error("Error al imprimir:", error);
-    res.status(500).send("Error al imprimir");
+    res.status(500).json({ error: "Error al imprimir el ticket" });
     next(error);
   }
 };

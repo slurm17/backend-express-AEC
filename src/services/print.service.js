@@ -10,8 +10,8 @@ import { fileURLToPath } from "url";
 escpos.Network = escposNetwork;
 // escpos.Network = require("escpos-network");
 
-const PRINTER_IP = "192.168.0.53";
-const PRINTER_PORT = 9100;
+const PRINTER_IP = process.env.PRINTER_IP;
+const PRINTER_PORT = Number(process.env.PRINTER_PORT);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 /**
@@ -61,7 +61,8 @@ export async function printTicket({
     dni, 
     codigo, 
     fechaEmision : fechaHora, 
-    fechaVencimiento: vencimiento 
+    fechaVencimiento: vencimiento,
+    tipoDePase
   }) {
   const device = new escpos.Network(PRINTER_IP, PRINTER_PORT);
   const printer = new escpos.Printer(device);
@@ -86,7 +87,7 @@ export async function printTicket({
     
     //DEFINIR TIPO DE PASE VARIABLE
 
-    printer.text("PASE DIARIO");
+    printer.text(tipoDePase);
     printer.text(""); // salto de línea
 
     printer.style("normal");
@@ -101,7 +102,7 @@ export async function printTicket({
     await new Promise((resolve, reject) => {
       printer.qrimage(`${codigo}`, { type: "png", mode: "dhdw" }, (err) => {
       // printer.qrimage(`PASE-${dni}-${Date.now()}`, { type: "png", mode: "dhdw" }, (err) => {
-        if (err) {return reject(err);}
+      if (err) {return reject(err);}
         resolve();
       });
     });
@@ -122,6 +123,7 @@ export async function printTicket({
     console.log("Ticket impreso correctamente.");
   } catch (error) {
     console.error("Error imprimiendo ticket:", error);
+    throw error;
   }
 }
 

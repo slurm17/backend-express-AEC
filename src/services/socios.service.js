@@ -12,8 +12,8 @@ const dataFakeSocio = `
   "status": "ok",
   "data": {
     "num_socio": "17",
-    "nombre": "JUAN GUSTAVO SOSA",
-    "estado_socio": "0",
+    "nombre": "JUAN GUSTAVO SOSA GUSTAVO SOSA",
+    "estado_socio": "2",
     "fecha_estado": "2025-09-06 00:00:00"
   }
 }
