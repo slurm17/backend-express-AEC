@@ -19,7 +19,7 @@ const dataFakeSocio = `
 }
 `;
 
-const USE_FAKE = true; // 🔥 cambia a false para usar la API real
+const USE_FAKE = process.env.USE_FAKE === "true"; // 🔥 cambia a false para usar la API real
     
 export const findSocioByDni = async (dni) => {
   const query = "SELECT * FROM socios WHERE documento = $1";

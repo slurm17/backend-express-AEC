@@ -11,6 +11,7 @@ import qrRoutes from "./routes/qr.routes.js";
 import configRoutes from "./routes/configuracion.routes.js";
 import releRoutes from "./routes/rele.routes.js";
 import releLibreRoutes from "./routes/rele-libre.routes.js";
+import eventosRoutes from "./routes/eventos.routes.js";
 import path from "path";
 import http from "http";
 // import { SerialPort } from "serialport";
@@ -57,6 +58,7 @@ app.use("/api/qr", qrRoutes);
 app.use("/api/config", configRoutes);
 app.use("/api/rele", releRoutes);
 app.use("/api/rele-libre", releLibreRoutes);
+app.use("/api/eventos", eventosRoutes);
 const staticDir = path.resolve(process.cwd(), "public", "fotos-socios");
 app.use("/fotos-socios", express.static(staticDir));
 app.use("/fotos-socios", (req, res) => {
