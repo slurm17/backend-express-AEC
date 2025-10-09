@@ -26,7 +26,7 @@ export const estadoSocioCinco = async ({dniLeido, io, dataSocio}) => {
     } else {
         emitAndRegister({
             io, 
-            mensaje: "ACCESO DENEGADO - SOCIO TEMPORARIO VENCIDO ❌", 
+            mensaje: "ACCESO DENEGADO - SOCIO TEMPORAL VENCIDO ❌", 
             data : dataSocio,
             tipoPase : "socio",
             dni: dniLeido,

@@ -102,8 +102,8 @@ export function entradaScanner(socketIo) {
                             dataSocio: dataSocioQrAccess 
                         });
                     }
-                    else if (dataSocioQrAccess?.estado_socio === "5") {
-                        await estadoSocioCinco({ 
+                    else if (dataSocioQrAccess?.estado_socio === "5" || dataSocioQrAccess?.estado_socio === "4") {
+                        await estadoSocioCinco({  
                             dniLeido: dataCodigoQr.documento, 
                             io, 
                             dataSocio: dataSocioQrAccess 
@@ -112,7 +112,7 @@ export function entradaScanner(socketIo) {
                         emitAndRegister({
                             io, 
                             // data : { dataCodigoQr },
-                            mensaje: "⛔️ ERROR - NO COINCIDE ESTADO SOCIO", 
+                            mensaje: "⛔️ ERROR - ESTADO DE SOCIO NO VÁLIDO", 
                             codigo_qr: dniLeido,
                             qr: true,
                             tipoPase : dataCodigoQr.tipo,
@@ -213,11 +213,23 @@ export function entradaScanner(socketIo) {
                     if (dataSocio?.estado_socio === "0") {
                         await estadoSocioCero({ dni: dniLeido, io, socio: dataSocio });
                     }
-                    if (dataSocio?.estado_socio === "2") {
+                    else if (dataSocio?.estado_socio === "2") {
                         await estadoSocioDos({ dniLeido, io, socioLocalDb, dataSocio });
                     }
-                    if (dataSocio?.estado_socio === "5") {
+                    else if (dataSocio?.estado_socio === "5" || dataSocio?.estado_socio === "4") {
                         await estadoSocioCinco({ dniLeido, io, dataSocio });
+                    } else {
+                        emitAndRegister({
+                            io, 
+                            // data : { dataCodigoQr },
+                            data: dataSocio,
+                            mensaje: "⛔️ ERROR - ESTADO DE SOCIO NO VÁLIDO", 
+                            // codigo_qr: dniLeido,
+                            // qr: true,
+                            // tipoPase : dataCodigoQr.tipo,
+                            dni: dniLeido,
+                            error : true
+                        });
                     }
                 }
             }
