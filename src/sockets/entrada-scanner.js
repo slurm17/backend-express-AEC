@@ -188,6 +188,8 @@ export function entradaScanner(socketIo) {
                     // Buscar en la base de datos local  
                     const socioDb = await findSocioByDni(dniLeido);
                     // Si no existe, crearlo
+                    const ahora = moment.tz("America/Argentina/Buenos_Aires");
+                    const fechaActual = moment(ahora).format("YYYY-MM-DD HH:mm:ss");
                     if (!socioDb) {
                         const config = await getConfiguracion();
                         await createSocio({
@@ -195,7 +197,7 @@ export function entradaScanner(socketIo) {
                             nom_y_ap: dataSocio.nombre,
                             estado: parseInt(dataSocio.estado_socio, 10),
                             nro_socio: dataSocio.num_socio,
-                            fecha_estado: dataSocio.fecha_estado,
+                            fecha_estado: dataSocio.fecha_estado || fechaActual,
                             // Corregir con config db
                             ingreso_restante: config?.pase_permitidos
                         }).then((nuevoSocio) => {
@@ -207,7 +209,7 @@ export function entradaScanner(socketIo) {
                         await updateSocio({
                             dni: parseInt(dniLeido, 10), // dniLeido,
                             nuevoEstado: parseInt(dataSocio.estado_socio, 10),
-                            nuevaFecha: dataSocio.fecha_estado
+                            nuevaFecha: dataSocio.fecha_estado || fechaActual
                         })
                     }
                     if (dataSocio?.estado_socio === "0") {
@@ -234,6 +236,7 @@ export function entradaScanner(socketIo) {
                 }
             }
             catch (err) {
+                console.log("🚀 ~ entradaScanner ~ err:", err)
                 emitAndRegister({
                     io, 
                     mensaje: "⛔️ ERROR AL CONSULTAR SOCIO", 
