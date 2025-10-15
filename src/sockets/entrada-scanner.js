@@ -68,13 +68,15 @@ export function entradaScanner(socketIo) {
                     // Buscar en la base de datos local
                     const socioDbQR = await findSocioByDni(dataCodigoQr.documento);
                     const config = await getConfiguracion();
+                    const ahora = moment.tz("America/Argentina/Buenos_Aires");
+                    const fechaActual = moment(ahora).format("YYYY-MM-DD HH:mm:ss");
                     if (!socioDbQR) {
                         await createSocio({
                             documento: dataCodigoQr.documento,
                             nom_y_ap: dataSocioQrAccess.nombre,
                             estado: parseInt(dataSocioQrAccess.estado_socio, 10),
                             nro_socio: dataSocioQrAccess.num_socio,
-                            fecha_estado: dataSocioQrAccess.fecha_estado,
+                            fecha_estado: dataSocioQrAccess.fecha_estado || fechaActual,
                             ingreso_restante: config?.pase_permitidos, 
                         }).then((nuevoSocio) => {
                             socioLocalDbQr = nuevoSocio;
@@ -84,7 +86,7 @@ export function entradaScanner(socketIo) {
                         await updateSocio({
                             dni: parseInt(dataCodigoQr.documento, 10), // dniLeido,
                             nuevoEstado: parseInt(dataSocioQrAccess.estado_socio, 10),
-                            nuevaFecha: dataSocioQrAccess.fecha_estado
+                            nuevaFecha: dataSocioQrAccess.fecha_estado || fechaActual
                         })
                     }
                     if (dataSocioQrAccess?.estado_socio === "0") {
