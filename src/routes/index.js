@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { pool } from "../config/db.js"
+const { Router } = require("express")
+const { pool } = require( "../config/db.js")
 const router = Router();
 
 // router.get("/", (req, res) => {
@@ -16,4 +16,4 @@ router.get("/", async (req, res) => {
   }
 });
 
-export default router;
+module.export = router;

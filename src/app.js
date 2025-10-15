@@ -1,33 +1,30 @@
-import express from "express";
-import cors from "cors";
-import routes from "./routes/index.js";
-import userRoutes from "./routes/user.routes.js";
-import accessRoutes from "./routes/access.routes.js";
-import imagenRoutes from "./routes/imagenes.routes.js";
-import textosRoutes from "./routes/textos.routes.js";
-import printRoutes from "./routes/print.routes.js";
-import socioRoutes from "./routes/socios.routes.js";
-import qrRoutes from "./routes/qr.routes.js";
-import configRoutes from "./routes/configuracion.routes.js";
-import releRoutes from "./routes/rele.routes.js";
-import releLibreRoutes from "./routes/rele-libre.routes.js";
-import eventosRoutes from "./routes/eventos.routes.js";
-import path from "path";
-import http from "http";
-// import { SerialPort } from "serialport";
-// import { ReadlineParser } from "@serialport/parser-readline";
-// import  { Server } from "socket.io";
-// import bodyParser from "body-parser";
-// import printRoutes from "./routes/";
-import { fileURLToPath } from "url";
-// import { activarRele } from "./services/relay.service.js"
-// import { SERIAL } from "./config/constants.js";
-import { initIo } from "./sockets/init-io.js";
-import { entradaScanner } from "./sockets/entrada-scanner.js";
-import { salidaScanner } from "./sockets/salida-scanner.js";
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+const http = require("http");
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Rutas
+const routes = require("./routes/index");
+const userRoutes = require("./routes/user.routes");
+const accessRoutes = require("./routes/access.routes");
+const imagenRoutes = require("./routes/imagenes.routes");
+const textosRoutes = require("./routes/textos.routes");
+const printRoutes = require("./routes/print.routes");
+const socioRoutes = require("./routes/socios.routes");
+const qrRoutes = require("./routes/qr.routes");
+const configRoutes = require("./routes/configuracion.routes");
+const releRoutes = require("./routes/rele.routes");
+const releLibreRoutes = require("./routes/rele-libre.routes");
+const eventosRoutes = require("./routes/eventos.routes");
+
+// Sockets
+const { initIo } = require("./sockets/init-io");
+const { entradaScanner } = require("./sockets/entrada-scanner");
+const { salidaScanner } = require("./sockets/salida-scanner");
+
+// import { fileURLToPath } from "url";
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = http.createServer(app);
@@ -41,11 +38,6 @@ salidaScanner(io);
 app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
-
-// app.use(express.static(path.join(__dirname, "public")));
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
-
 // Rutas
 app.use("/api", routes);
 app.use("/api/users", userRoutes);
@@ -67,4 +59,5 @@ app.use("/fotos-socios", (req, res) => {
 
 // app.use("/api", printRoutes);
 
-export default app;
+module.exports = app;
+// export default app;
