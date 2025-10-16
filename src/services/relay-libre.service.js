@@ -11,7 +11,7 @@ export const activarReleLibre = async (puerto) => {
     await client.writeCoil(puerto, !estado.data[puerto]);
     console.log("Relé activado");
 
-    return { success: true };
+    return { success: true, estado: !estado.data[puerto] };
   } catch (err) {
     if (err instanceof Error) {
       console.error("Error Modbus:", err.message);
