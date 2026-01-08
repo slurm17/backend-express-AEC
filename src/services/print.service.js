@@ -10,8 +10,6 @@ import { fileURLToPath } from "url";
 escpos.Network = escposNetwork;
 // escpos.Network = require("escpos-network");
 
-const PRINTER_IP = process.env.PRINTER_IP;
-const PRINTER_PORT = Number(process.env.PRINTER_PORT);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 /**
@@ -62,9 +60,11 @@ export async function printTicket({
     codigo, 
     fechaEmision : fechaHora, 
     fechaVencimiento: vencimiento,
-    tipoDePase
+    tipoDePase,
+    ip,
+    puerto
   }) {
-  const device = new escpos.Network(PRINTER_IP, PRINTER_PORT);
+  const device = new escpos.Network(ip, Number(puerto));
   const printer = new escpos.Printer(device);
 
   try {

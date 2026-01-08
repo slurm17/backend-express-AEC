@@ -19,6 +19,18 @@ const dataFakeSocio = `
 }
 `;
 
+// const dataFakeSocio = `
+// {
+//   "status": "ok",
+//   "data": {
+//     "num_socio": "17",
+//     "nombre": "JUAN GUSTAVO SOSA GUSTAVO SOSA",
+//     "estado_socio": "2",
+//     "id_familiar": "8114"
+//   }
+// }
+// `;
+
 const USE_FAKE = process.env.USE_FAKE === "true"; // 🔥 cambia a false para usar la API real
     
 export const findSocioByDni = async (dni) => {

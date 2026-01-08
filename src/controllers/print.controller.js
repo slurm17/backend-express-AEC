@@ -1,22 +1,23 @@
 import { printTicket } from "../services/print.service.js";
 
-// async function imprimirTicket(req, res) {
-//   const { nombre, apellido, dni } = req.body;
-//   try {
-//     await printTicket({ nombre, apellido, dni });
-//     res.send("Ticket enviado a imprimir");
-//   } catch (err) {
-//     console.error("Error al imprimir:", err);
-//     res.status(500).send("Error al imprimir");
-//   }
-// }
-
-// module.exports = { imprimirTicket };
 
 export const imprimirTicket = async (req, res, next) => {
   try {
-    const { nombre, apellido, dni, codigo, fechaEmision, fechaVencimiento, tipoDePase= "PASE QR" } = req.body;
-    await printTicket({ nombre, apellido, dni, codigo, fechaEmision, fechaVencimiento, tipoDePase });
+    const { 
+      nombre, 
+      apellido, 
+      dni, 
+      codigo, 
+      fechaEmision, 
+      fechaVencimiento, 
+      tipoDePase= "PASE QR", 
+      ip, 
+      puerto 
+    } = req.body;
+    if (!ip || !puerto) {
+      return res.status(400).json({ error: "Faltan los parámetros 'ip' o 'puerto'" });
+    }
+    await printTicket({ nombre, apellido, dni, codigo, fechaEmision, fechaVencimiento, tipoDePase, ip, puerto });
     res.json({ message: "Ticket enviado a imprimir" });
   } catch (error) {
     console.error("Error al imprimir:", error);

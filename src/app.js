@@ -12,16 +12,10 @@ import configRoutes from "./routes/configuracion.routes.js";
 import releRoutes from "./routes/rele.routes.js";
 import releLibreRoutes from "./routes/rele-libre.routes.js";
 import eventosRoutes from "./routes/eventos.routes.js";
+import impresorasRoutes from "./routes/impresoras.routes.js";
 import path from "path";
 import http from "http";
-// import { SerialPort } from "serialport";
-// import { ReadlineParser } from "@serialport/parser-readline";
-// import  { Server } from "socket.io";
-// import bodyParser from "body-parser";
-// import printRoutes from "./routes/";
 import { fileURLToPath } from "url";
-// import { activarRele } from "./services/relay.service.js"
-// import { SERIAL } from "./config/constants.js";
 import { initIo } from "./sockets/init-io.js";
 import { entradaScanner } from "./sockets/entrada-scanner.js";
 import { salidaScanner } from "./sockets/salida-scanner.js";
@@ -42,9 +36,6 @@ app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// app.use(express.static(path.join(__dirname, "public")));
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
 
 // Rutas
 app.use("/api", routes);
@@ -59,6 +50,7 @@ app.use("/api/config", configRoutes);
 app.use("/api/rele", releRoutes);
 app.use("/api/rele-libre", releLibreRoutes);
 app.use("/api/eventos", eventosRoutes);
+app.use("/api/impresoras", impresorasRoutes);
 const staticDir = path.resolve(process.cwd(), "public", "fotos-socios");
 app.use("/fotos-socios", express.static(staticDir));
 app.use("/fotos-socios", (req, res) => {
